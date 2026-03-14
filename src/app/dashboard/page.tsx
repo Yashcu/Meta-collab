@@ -2,8 +2,10 @@ import { auth } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
 import { getAuthUser } from '@/lib/auth'
 import { getUserProjects } from '@/lib/services/project.service'
+import { getPendingInvitations } from '@/lib/services/invitation.service'
 import { ProjectCard } from '@/components/shared/ProjectCard'
 import { CreateProjectModal } from '@/components/shared/CreateProjectModal'
+import { PendingInvitations } from '@/components/shared/PendingInvitations'
 
 export default async function DashboardPage() {
     const { userId } = await auth()
@@ -12,7 +14,10 @@ export default async function DashboardPage() {
     const dbUser = await getAuthUser()
     if (!dbUser) redirect('/sign-in')
 
-    const projects = await getUserProjects(dbUser.id)
+    const [projects, invitations] = await Promise.all([
+        getUserProjects(dbUser.id),
+        getPendingInvitations(dbUser.email),
+    ])
 
     return (
         <div className="min-h-screen bg-slate-50">
@@ -27,6 +32,8 @@ export default async function DashboardPage() {
             </header>
 
             <main className="max-w-5xl mx-auto px-6 py-8">
+                <PendingInvitations invitations={invitations} />
+
                 {projects.length === 0 ? (
                     <div className="text-center py-20">
                         <p className="text-slate-400 text-lg">No projects yet</p>
