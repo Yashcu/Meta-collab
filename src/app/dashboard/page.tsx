@@ -6,6 +6,7 @@ import { getPendingInvitations } from '@/lib/services/invitation.service'
 import { ProjectCard } from '@/components/shared/ProjectCard'
 import { CreateProjectModal } from '@/components/shared/CreateProjectModal'
 import { PendingInvitations } from '@/components/shared/PendingInvitations'
+import { SignOutButton } from '@clerk/nextjs'
 
 export default async function DashboardPage() {
     const { userId } = await auth()
@@ -27,6 +28,11 @@ export default async function DashboardPage() {
                     <div className="flex items-center gap-3">
                         <span className="text-sm text-slate-500">{dbUser.name}</span>
                         <CreateProjectModal />
+                        <SignOutButton>
+                            <button className="text-sm text-slate-400 hover:text-slate-600 transition-colors px-2 py-1 rounded hover:bg-slate-100">
+                                Sign out
+                            </button>
+                        </SignOutButton>
                     </div>
                 </div>
             </header>
