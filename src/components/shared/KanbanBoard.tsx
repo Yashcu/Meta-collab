@@ -126,16 +126,15 @@ export function KanbanBoard({
         setOverId(null)
 
         if (!over) {
-            // Dropped outside — resume polling
             pollRef.current = setInterval(pollTasks, 5000)
             return
         }
 
         const activeId = active.id as string
-        const overId = over.id as string
+        const overItemId = over.id as string
 
         const activeColumn = getColumnFromId(activeId)
-        const overColumn = getColumnFromId(overId)
+        const overColumn = getColumnFromId(overItemId)
 
         if (!activeColumn || !overColumn) {
             pollRef.current = setInterval(pollTasks, 5000)
@@ -144,60 +143,54 @@ export function KanbanBoard({
 
         setIsSaving(true)
 
-        // Calculate new order
         let newTasks = [...tasks]
         const activeIndex = newTasks.findIndex((t) => t.id === activeId)
 
         if (activeColumn === overColumn) {
-            // Reordering within same column
-            const overIndex = newTasks.findIndex((t) => t.id === overId)
-            if (activeIndex !== overIndex) {
+            const overIndex = newTasks.findIndex((t) => t.id === overItemId)
+            if (activeIndex !== overIndex && overIndex !== -1) {
                 newTasks = arrayMove(newTasks, activeIndex, overIndex)
             }
         }
 
-        // Recalculate order values for affected column
-        const columnTasks = newTasks
-            .filter((t) => t.status === overColumn)
-            .map((t, i) => ({ ...t, order: i }))
+        // Recalculate clean order for ALL affected columns
+        const affectedStatuses = Array.from(
+            new Set([activeColumn, overColumn])
+        )
 
-        const updatedTasks = newTasks.map((t) => {
-            const updated = columnTasks.find((ct) => ct.id === t.id)
-            return updated || t
+        const updates: { id: string; status: string; order: number }[] = []
+
+        affectedStatuses.forEach((status) => {
+            newTasks
+                .filter((t) => t.status === status)
+                .forEach((t, i) => {
+                    updates.push({ id: t.id, status, order: i })
+                })
         })
 
-        setTasks(updatedTasks)
+        // Apply clean orders to local state
+        const orderMap = new Map(updates.map((u) => [u.id, u.order]))
+        const finalTasks = newTasks.map((t) => ({
+            ...t,
+            order: orderMap.has(t.id) ? orderMap.get(t.id)! : t.order,
+        }))
 
-        // Find the moved task with new values
-        const movedTask = updatedTasks.find((t) => t.id === activeId)
-        if (!movedTask) {
-            setIsSaving(false)
-            pollRef.current = setInterval(pollTasks, 5000)
-            return
-        }
+        setTasks(finalTasks)
 
         try {
             const res = await fetch(
-                `/api/projects/${projectId}/tasks/${activeId}`,
+                `/api/projects/${projectId}/tasks/reorder`,
                 {
-                    method: 'PUT',
+                    method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        status: movedTask.status,
-                        order: movedTask.order,
-                    }),
+                    body: JSON.stringify({ updates }),
                 }
             )
-
-            if (!res.ok) {
-                // Revert on failure
-                await pollTasks()
-            }
+            if (!res.ok) await pollTasks()
         } catch {
             await pollTasks()
         } finally {
             setIsSaving(false)
-            // Resume polling
             pollRef.current = setInterval(pollTasks, 5000)
         }
     }

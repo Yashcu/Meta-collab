@@ -134,3 +134,33 @@ export async function deleteTask(
 
     return db.task.delete({ where: { id: taskId } })
 }
+
+export async function reorderTasks(
+    projectId: string,
+    userId: string,
+    updates: { id: string; status: string; order: number }[]
+) {
+    const member = await db.projectMember.findFirst({
+        where: { projectId, userId },
+    })
+    if (!member) throw new Error('FORBIDDEN')
+
+    // Run all updates in a transaction
+    await db.$transaction(
+        updates.map(({ id, status, order }) =>
+            db.task.update({
+                where: { id, projectId },
+                data: { status, order },
+            })
+        )
+    )
+
+    return db.task.findMany({
+        where: { projectId },
+        include: {
+            assignedTo: { select: { id: true, name: true, email: true } },
+            createdBy: { select: { id: true, name: true, email: true } },
+        },
+        orderBy: [{ status: 'asc' }, { order: 'asc' }],
+    })
+}

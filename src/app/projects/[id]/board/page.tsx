@@ -6,6 +6,7 @@ import { getProjectTasks } from '@/lib/services/task.service'
 import { KanbanBoard } from '@/components/shared/KanbanBoard'
 import { InviteModal } from '@/components/shared/InviteModal'
 import Link from 'next/link'
+import { BoardErrorBoundary } from '@/components/shared/BoardErrorBoundary'
 
 export default async function BoardPage({
     params,
@@ -70,12 +71,14 @@ export default async function BoardPage({
 
             <main className="max-w-6xl mx-auto px-6 py-6 overflow-x-auto">
                 <div className="min-w-[700px]">
-                    <KanbanBoard
-                        projectId={project.id}
-                        currentUserId={dbUser.id}
-                        isAdmin={isAdmin}
-                        initialTasks={tasks as any}
-                    />
+                    <BoardErrorBoundary>
+                        <KanbanBoard
+                            projectId={project.id}
+                            currentUserId={dbUser.id}
+                            isAdmin={isAdmin}
+                            initialTasks={tasks as any}
+                        />
+                    </BoardErrorBoundary>
                 </div>
             </main>
         </div>

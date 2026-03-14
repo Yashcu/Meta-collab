@@ -31,13 +31,20 @@ export function DraggableTaskCard({
 
     const style = {
         transform: CSS.Transform.toString(transform),
-        transition,
-        opacity: isDragging ? 0.4 : 1,
+        transition: isDragging ? 'none' : transition,
+        opacity: isDragging ? 0.35 : 1,
+        position: isDragging ? ('relative' as const) : undefined,
         zIndex: isDragging ? 999 : undefined,
     }
 
     return (
-        <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+        <div
+            ref={setNodeRef}
+            style={style}
+            {...attributes}
+            {...listeners}
+            className="touch-none"
+        >
             <TaskCard
                 task={task}
                 currentUserId={currentUserId}
