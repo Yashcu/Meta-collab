@@ -4,9 +4,10 @@ import { getAuthUser } from '@/lib/auth'
 import { getProjectById } from '@/lib/services/project.service'
 import { getProjectTasks } from '@/lib/services/task.service'
 import { KanbanBoard } from '@/components/shared/KanbanBoard'
-import { InviteModal } from '@/components/shared/InviteModal'
-import Link from 'next/link'
 import { BoardErrorBoundary } from '@/components/shared/BoardErrorBoundary'
+import { InviteModal } from '@/components/shared/InviteModal'
+import { ChatPanel } from '@/components/shared/ChatPanel'
+import Link from 'next/link'
 
 export default async function BoardPage({
     params,
@@ -81,6 +82,11 @@ export default async function BoardPage({
                     </BoardErrorBoundary>
                 </div>
             </main>
+
+            <ChatPanel
+                projectId={project.id}
+                currentUserId={dbUser.id}
+            />
         </div>
     )
 }
