@@ -1,17 +1,12 @@
 import { getAuthUser } from '@/lib/auth'
 import { NextResponse } from 'next/server'
 
-export async function GET() {
+export async function POST() {
     const user = await getAuthUser()
 
     if (!user) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    return NextResponse.json({
-        id: user.id,
-        clerkId: user.clerkId,
-        email: user.email,
-        name: user.name,
-    })
+    return NextResponse.json({ user })
 }
