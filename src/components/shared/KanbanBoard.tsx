@@ -1,11 +1,24 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
-import { TaskColumn } from './TaskColumn'
-import { Task } from './TaskCard'
+import { useState, useEffect, useCallback, useRef } from 'react'
+import {
+    DndContext,
+    DragEndEvent,
+    DragOverEvent,
+    DragStartEvent,
+    PointerSensor,
+    KeyboardSensor,
+    useSensor,
+    useSensors,
+    DragOverlay,
+    closestCorners,
+} from '@dnd-kit/core'
+import { sortableKeyboardCoordinates, arrayMove } from '@dnd-kit/sortable'
+import { DroppableColumn } from './DroppableColumn'
+import { TaskCard, Task } from './TaskCard'
 
 const STATUSES = ['TODO', 'IN_PROGRESS', 'DONE'] as const
-
+type Status = typeof STATUSES[number]
 type Member = { id: string; name: string | null; email: string; role: string }
 
 export function KanbanBoard({
@@ -21,10 +34,24 @@ export function KanbanBoard({
 }) {
     const [tasks, setTasks] = useState<Task[]>(initialTasks)
     const [members, setMembers] = useState<Member[]>([])
+    const [activeTask, setActiveTask] = useState<Task | null>(null)
+    const [overId, setOverId] = useState<string | null>(null)
     const [addingToStatus, setAddingToStatus] = useState<string | null>(null)
     const [editingTask, setEditingTask] = useState<Task | null>(null)
+    const [isSaving, setIsSaving] = useState(false)
+    const pollRef = useRef<NodeJS.Timeout | null>(null)
+
+    const sensors = useSensors(
+        useSensor(PointerSensor, {
+            activationConstraint: { distance: 8 },
+        }),
+        useSensor(KeyboardSensor, {
+            coordinateGetter: sortableKeyboardCoordinates,
+        })
+    )
 
     const pollTasks = useCallback(async () => {
+        if (isSaving) return
         try {
             const res = await fetch(`/api/projects/${projectId}/tasks`)
             if (!res.ok) return
@@ -33,7 +60,7 @@ export function KanbanBoard({
         } catch {
             // silent fail
         }
-    }, [projectId])
+    }, [projectId, isSaving])
 
     useEffect(() => {
         async function fetchMembers() {
@@ -50,14 +77,129 @@ export function KanbanBoard({
     }, [projectId])
 
     useEffect(() => {
-        const interval = setInterval(pollTasks, 5000)
-        return () => clearInterval(interval)
+        pollRef.current = setInterval(pollTasks, 5000)
+        return () => {
+            if (pollRef.current) clearInterval(pollRef.current)
+        }
     }, [pollTasks])
 
     function getTasksByStatus(status: string) {
         return tasks
             .filter((t) => t.status === status)
             .sort((a, b) => a.order - b.order)
+    }
+
+    function getColumnFromId(id: string): Status | null {
+        if (STATUSES.includes(id as Status)) return id as Status
+        const task = tasks.find((t) => t.id === id)
+        return task ? (task.status as Status) : null
+    }
+
+    function handleDragStart(event: DragStartEvent) {
+        const task = tasks.find((t) => t.id === event.active.id)
+        if (task) setActiveTask(task)
+        // Pause polling while dragging
+        if (pollRef.current) clearInterval(pollRef.current)
+    }
+
+    function handleDragOver(event: DragOverEvent) {
+        const { active, over } = event
+        if (!over) return
+        setOverId(over.id as string)
+
+        const activeColumn = getColumnFromId(active.id as string)
+        const overColumn = getColumnFromId(over.id as string)
+
+        if (!activeColumn || !overColumn || activeColumn === overColumn) return
+
+        // Moving to a different column — update status optimistically
+        setTasks((prev) =>
+            prev.map((t) =>
+                t.id === active.id ? { ...t, status: overColumn } : t
+            )
+        )
+    }
+
+    async function handleDragEnd(event: DragEndEvent) {
+        const { active, over } = event
+        setActiveTask(null)
+        setOverId(null)
+
+        if (!over) {
+            // Dropped outside — resume polling
+            pollRef.current = setInterval(pollTasks, 5000)
+            return
+        }
+
+        const activeId = active.id as string
+        const overId = over.id as string
+
+        const activeColumn = getColumnFromId(activeId)
+        const overColumn = getColumnFromId(overId)
+
+        if (!activeColumn || !overColumn) {
+            pollRef.current = setInterval(pollTasks, 5000)
+            return
+        }
+
+        setIsSaving(true)
+
+        // Calculate new order
+        let newTasks = [...tasks]
+        const activeIndex = newTasks.findIndex((t) => t.id === activeId)
+
+        if (activeColumn === overColumn) {
+            // Reordering within same column
+            const overIndex = newTasks.findIndex((t) => t.id === overId)
+            if (activeIndex !== overIndex) {
+                newTasks = arrayMove(newTasks, activeIndex, overIndex)
+            }
+        }
+
+        // Recalculate order values for affected column
+        const columnTasks = newTasks
+            .filter((t) => t.status === overColumn)
+            .map((t, i) => ({ ...t, order: i }))
+
+        const updatedTasks = newTasks.map((t) => {
+            const updated = columnTasks.find((ct) => ct.id === t.id)
+            return updated || t
+        })
+
+        setTasks(updatedTasks)
+
+        // Find the moved task with new values
+        const movedTask = updatedTasks.find((t) => t.id === activeId)
+        if (!movedTask) {
+            setIsSaving(false)
+            pollRef.current = setInterval(pollTasks, 5000)
+            return
+        }
+
+        try {
+            const res = await fetch(
+                `/api/projects/${projectId}/tasks/${activeId}`,
+                {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        status: movedTask.status,
+                        order: movedTask.order,
+                    }),
+                }
+            )
+
+            if (!res.ok) {
+                // Revert on failure
+                await pollTasks()
+            }
+        } catch {
+            await pollTasks()
+        } finally {
+            setIsSaving(false)
+            // Resume polling
+            pollRef.current = setInterval(pollTasks, 5000)
+        }
     }
 
     async function handleDeleteTask(taskId: string) {
@@ -75,20 +217,43 @@ export function KanbanBoard({
 
     return (
         <>
-            <div className="grid grid-cols-3 gap-4 w-full">
-                {STATUSES.map((status) => (
-                    <TaskColumn
-                        key={status}
-                        status={status}
-                        tasks={getTasksByStatus(status)}
-                        currentUserId={currentUserId}
-                        isAdmin={isAdmin}
-                        onAddTask={(s) => setAddingToStatus(s)}
-                        onEditTask={(task) => setEditingTask(task)}
-                        onDeleteTask={handleDeleteTask}
-                    />
-                ))}
-            </div>
+            <DndContext
+                sensors={sensors}
+                collisionDetection={closestCorners}
+                onDragStart={handleDragStart}
+                onDragOver={handleDragOver}
+                onDragEnd={handleDragEnd}
+            >
+                <div className="grid grid-cols-3 gap-4 w-full">
+                    {STATUSES.map((status) => (
+                        <DroppableColumn
+                            key={status}
+                            status={status}
+                            tasks={getTasksByStatus(status)}
+                            currentUserId={currentUserId}
+                            isAdmin={isAdmin}
+                            isOver={overId === status || getColumnFromId(overId ?? '') === status}
+                            onAddTask={(s) => setAddingToStatus(s)}
+                            onEditTask={(task) => setEditingTask(task)}
+                            onDeleteTask={handleDeleteTask}
+                        />
+                    ))}
+                </div>
+
+                <DragOverlay>
+                    {activeTask && (
+                        <div className="rotate-2 scale-105 shadow-xl opacity-95">
+                            <TaskCard
+                                task={activeTask}
+                                currentUserId={currentUserId}
+                                isAdmin={isAdmin}
+                                onEdit={() => { }}
+                                onDelete={() => { }}
+                            />
+                        </div>
+                    )}
+                </DragOverlay>
+            </DndContext>
 
             {addingToStatus && (
                 <AddTaskModal
