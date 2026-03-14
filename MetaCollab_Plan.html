@@ -1,0 +1,1565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MetaCollab - Complete Planning Document (CORRECTED)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            border-bottom: 3px solid #2563eb;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            color: #2563eb;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 1.1em;
+        }
+        
+        h2 {
+            color: #1e40af;
+            font-size: 1.8em;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        
+        h3 {
+            color: #2563eb;
+            font-size: 1.3em;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+        
+        h4 {
+            color: #475569;
+            font-size: 1.1em;
+            margin-top: 15px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        p {
+            margin-bottom: 12px;
+            line-height: 1.8;
+        }
+        
+        ul, ol {
+            margin-left: 25px;
+            margin-bottom: 15px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+        }
+        
+        .section {
+            margin-bottom: 35px;
+        }
+        
+        .highlight {
+            background-color: #eff6ff;
+            border-left: 4px solid #2563eb;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        
+        .warning {
+            background-color: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        
+        .critical {
+            background-color: #fee2e2;
+            border-left: 4px solid #dc2626;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        
+        .success {
+            background-color: #f0fdf4;
+            border-left: 4px solid #16a34a;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        th {
+            background-color: #2563eb;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        tr:last-child td {
+            border-bottom: none;
+        }
+        
+        tr:hover {
+            background-color: #f8fafc;
+        }
+        
+        .code-block {
+            background-color: #1f2937;
+            color: #e5e7eb;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+        
+        .tech-stack {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .tech-item {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .tech-item strong {
+            color: #2563eb;
+        }
+        
+        .timeline {
+            margin: 20px 0;
+        }
+        
+        .timeline-item {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        
+        .timeline-marker {
+            width: 30px;
+            height: 30px;
+            background: #2563eb;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            margin-right: 20px;
+            flex-shrink: 0;
+            margin-top: 5px;
+        }
+        
+        .timeline-content h4 {
+            margin-top: 0;
+        }
+        
+        .database-schema {
+            margin: 20px 0;
+        }
+        
+        .table-schema {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 6px;
+            margin: 15px 0;
+            border: 1px solid #cbd5e1;
+        }
+        
+        .field {
+            display: flex;
+            margin-bottom: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .field:last-child {
+            border-bottom: none;
+        }
+        
+        .field-name {
+            font-weight: 600;
+            width: 150px;
+            color: #2563eb;
+        }
+        
+        .field-type {
+            width: 150px;
+            color: #666;
+            font-family: monospace;
+        }
+        
+        .field-desc {
+            flex: 1;
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .endpoint {
+            background: #f0f9ff;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+            border-left: 4px solid #0284c7;
+            font-family: monospace;
+            font-size: 0.95em;
+        }
+        
+        .method {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-weight: bold;
+            margin-right: 10px;
+            font-size: 0.85em;
+        }
+        
+        .get { background: #dcfce7; color: #166534; }
+        .post { background: #bfdbfe; color: #1e40af; }
+        .patch { background: #fcd34d; color: #713f12; }
+        .put { background: #fed7aa; color: #9a3412; }
+        .delete { background: #fecaca; color: #991b1b; }
+        
+        .feature-list {
+            list-style: none;
+        }
+        
+        .feature-list li:before {
+            content: "✓ ";
+            color: #16a34a;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .toc {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 30px;
+        }
+        
+        .toc h3 {
+            margin-top: 0;
+        }
+        
+        .toc ul {
+            list-style: none;
+            margin-left: 0;
+        }
+        
+        .toc li {
+            margin-bottom: 8px;
+        }
+        
+        .toc a {
+            color: #2563eb;
+            text-decoration: none;
+        }
+        
+        .toc a:hover {
+            text-decoration: underline;
+        }
+        
+        @media print {
+            body {
+                background: white;
+            }
+            .container {
+                box-shadow: none;
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <h1>🚀 MetaCollab</h1>
+            <p class="subtitle">Complete Planning & Development Document (CORRECTED VERSION)</p>
+            <p style="margin-top: 10px; color: #999; font-size: 0.9em;">Collaborative Project Management Platform | Timeline: 2-3 weeks MVP | Production-Ready Architecture</p>
+        </div>
+
+        <div class="critical">
+            ⚡ <strong>VERSION 2.0:</strong> All critical architecture issues fixed. No more broadcast confusion, proper heartbeat cleanup, real security checks, optimized polling intervals, and proper database indexing.
+        </div>
+
+        <!-- TABLE OF CONTENTS -->
+        <div class="toc">
+            <h3>📋 Table of Contents</h3>
+            <ul>
+                <li><a href="#overview">1. Project Overview</a></li>
+                <li><a href="#realtime">2. Real-time Architecture (CORRECTED)</a></li>
+                <li><a href="#database">3. Database Schema with Indexes</a></li>
+                <li><a href="#api">4. API Endpoints & Security</a></li>
+                <li><a href="#clerk">5. Authentication & Permissions</a></li>
+                <li><a href="#services">6. Service Layer Architecture</a></li>
+                <li><a href="#frontend">7. Frontend Architecture</a></li>
+                <li><a href="#roadmap">8. Development Roadmap</a></li>
+            </ul>
+        </div>
+
+        <!-- SECTION 1: PROJECT OVERVIEW -->
+        <div class="section" id="overview">
+            <h2>1. Project Overview</h2>
+            
+            <h3>What is MetaCollab?</h3>
+            <p>MetaCollab is a collaborative project management platform that enables teams of 5-20 people to work together. It combines project management, real-time task tracking, and instant messaging in one intuitive interface.</p>
+            
+            <h3>Core Features (MVP)</h3>
+            <ul class="feature-list">
+                <li>User authentication via Clerk</li>
+                <li>Create and manage projects</li>
+                <li>Invite team members by email</li>
+                <li>Kanban board with real-time updates</li>
+                <li>Ephemeral live chat (messages vanish when workspace is empty)</li>
+                <li>Real-time presence (see who's online)</li>
+                <li>Role-based access (Admin/Member)</li>
+            </ul>
+
+            <h3>Tech Stack (Final)</h3>
+            <div class="tech-stack">
+                <div class="tech-item">
+                    <strong>Frontend</strong>
+                    <p>Next.js 14+ with TypeScript</p>
+                </div>
+                <div class="tech-item">
+                    <strong>Backend</strong>
+                    <p>Next.js API Routes</p>
+                </div>
+                <div class="tech-item">
+                    <strong>Database</strong>
+                    <p>PostgreSQL + Prisma ORM</p>
+                </div>
+                <div class="tech-item">
+                    <strong>Authentication</strong>
+                    <p>Clerk (signup/login only)</p>
+                </div>
+                <div class="tech-item">
+                    <strong>Real-time</strong>
+                    <p>HTTP Polling (no WebSockets)</p>
+                </div>
+                <div class="tech-item">
+                    <strong>UI</strong>
+                    <p>Shadcn/ui + Tailwind CSS</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 2: REAL-TIME ARCHITECTURE (CORRECTED) -->
+        <div class="section" id="realtime">
+            <h2>2. Real-time Architecture (CORRECTED)</h2>
+            
+            <h3>❌ WRONG Explanation</h3>
+            <div class="critical">
+                Do NOT do this: "Send message → Broadcast to all in workspace"<br>
+                You are NOT using WebSockets. There is NO broadcast layer.
+            </div>
+
+            <h3>✅ CORRECT Flow: HTTP Polling</h3>
+
+            <h4>Live Chat Flow</h4>
+            <div class="code-block">
+User A sends message:
+  1. Type message → Click send
+  2. POST /api/projects/[id]/chat
+  3. Backend: Store message in DB
+  4. Return success to User A
+  5. Message appears immediately on User A's screen (optimistic update)
+
+User B receives message:
+  1. Browser runs: GET /api/projects/[id]/chat/poll?since=lastTimestamp
+  2. Poll runs every 2 seconds (NOT 1.5s - too aggressive)
+  3. Backend returns: { messages: [...], activeUsers: [...] }
+  4. User B's frontend updates chat display
+  5. Both see message in sync
+            </div>
+
+            <h4>Kanban Board Real-time Flow</h4>
+            <div class="code-block">
+User A drags task:
+  1. User A drags task "Design homepage" from Todo → In Progress
+  2. Optimistic update: Show change on User A's screen immediately
+  3. PUT /api/projects/[id]/tasks/[taskId]
+     Body: { status: "IN_PROGRESS", order: 2 }
+  4. Backend: Update DB
+  5. Return success
+
+User B sees the update:
+  1. Browser runs: GET /api/projects/[id]/tasks
+  2. Poll runs every 4 seconds (slower than chat)
+  3. Backend returns full task list
+  4. Detect differences from local state
+  5. User B's board updates to show task in new position
+            </div>
+
+            <h3>⚠️ CRITICAL: Ephemeral Chat Cleanup Logic</h3>
+            
+            <div class="critical">
+                <strong>WRONG:</strong> "Delete messages when last user leaves workspace"<br>
+                Why it breaks: Browsers close unexpectedly, no reliable "leave" event<br><br>
+                <strong>CORRECT:</strong> Use heartbeat timeout
+            </div>
+
+            <h4>How Cleanup Actually Works</h4>
+            <div class="code-block">
+ActiveUsers table tracks presence:
+  - id, projectId, userId, lastHeartbeat
+
+User joins workspace:
+  1. POST /api/projects/[id]/chat/heartbeat
+  2. Create/update ActiveUsers row
+  3. Set lastHeartbeat = NOW()
+
+User stays in workspace:
+  1. Every 30 seconds: POST heartbeat again
+  2. Update lastHeartbeat = NOW()
+
+Cleanup job (run every 2 minutes):
+  1. Check all projects
+  2. Find where: lastHeartbeat < NOW() - 5 minutes
+  3. If NO active users for 5+ minutes:
+     → DELETE all ChatMessages for that project
+     → DELETE all ActiveUsers entries
+     → Workspace becomes clean slate
+            </div>
+
+            <h3>Polling Intervals (Optimized)</h3>
+            <table>
+                <tr>
+                    <th>What</th>
+                    <th>Interval</th>
+                    <th>Reason</th>
+                </tr>
+                <tr>
+                    <td>Chat messages</td>
+                    <td>2000ms (2 seconds)</td>
+                    <td>Feels instant, ~3 req/sec per user, manageable</td>
+                </tr>
+                <tr>
+                    <td>Task list (Kanban)</td>
+                    <td>4000ms (4 seconds)</td>
+                    <td>Less frequent changes, reduce load</td>
+                </tr>
+                <tr>
+                    <td>Active users</td>
+                    <td>2000ms (with chat poll)</td>
+                    <td>Included in chat response, no extra request</td>
+                </tr>
+                <tr>
+                    <td>Heartbeat</td>
+                    <td>30000ms (30 seconds)</td>
+                    <td>Keep user marked as active (prevents cleanup)</td>
+                </tr>
+            </table>
+
+            <h3>Load Estimation (5-20 users)</h3>
+            <div class="highlight">
+                With 10 users in a workspace:<br>
+                • Chat poll: 10 users × 1 req/2s = 5 req/sec<br>
+                • Task poll: 10 users × 1 req/4s = 2.5 req/sec<br>
+                • Total: ~7.5 req/sec = manageable, no scaling issues
+            </div>
+        </div>
+
+        <!-- SECTION 3: DATABASE SCHEMA -->
+        <div class="section" id="database">
+            <h2>3. Database Schema with Indexes</h2>
+            
+            <h3>Prisma Schema (schema.prisma)</h3>
+
+            <h4>Users Table</h4>
+            <div class="table-schema">
+                <div class="field">
+                    <span class="field-name">id</span>
+                    <span class="field-type">String (PK)</span>
+                    <span class="field-desc">Clerk user ID (clerk_xxx) - source of truth</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">email</span>
+                    <span class="field-type">String</span>
+                    <span class="field-desc">Email (cached from Clerk for reference)</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">name</span>
+                    <span class="field-type">String</span>
+                    <span class="field-desc">Full name</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">createdAt</span>
+                    <span class="field-type">DateTime</span>
+                    <span class="field-desc">Account creation</span>
+                </div>
+            </div>
+
+            <div class="critical">
+                ⚠️ <strong>SECURITY:</strong> Never trust email/name from client. Always read from Clerk session. This table is for queries only - user identity comes from Clerk.
+            </div>
+
+            <h4>Projects Table</h4>
+            <div class="table-schema">
+                <div class="field">
+                    <span class="field-name">id</span>
+                    <span class="field-type">String (PK)</span>
+                    <span class="field-desc">UUID</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">name</span>
+                    <span class="field-type">String</span>
+                    <span class="field-desc">Project name</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">description</span>
+                    <span class="field-type">String (nullable)</span>
+                    <span class="field-desc">Optional description</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">adminId</span>
+                    <span class="field-type">String (FK)</span>
+                    <span class="field-desc">Creator (always admin)</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">createdAt</span>
+                    <span class="field-type">DateTime</span>
+                    <span class="field-desc">Creation timestamp</span>
+                </div>
+            </div>
+
+            <h4>ProjectMembers Table</h4>
+            <div class="table-schema">
+                <div class="field">
+                    <span class="field-name">id</span>
+                    <span class="field-type">String (PK)</span>
+                    <span class="field-desc">UUID</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">projectId</span>
+                    <span class="field-type">String (FK)</span>
+                    <span class="field-desc">Which project</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">userId</span>
+                    <span class="field-type">String (FK)</span>
+                    <span class="field-desc">Which user</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">role</span>
+                    <span class="field-type">Enum</span>
+                    <span class="field-desc">"ADMIN" or "MEMBER"</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">joinedAt</span>
+                    <span class="field-type">DateTime</span>
+                    <span class="field-desc">When user joined</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">Unique constraint</span>
+                    <span class="field-type">@@unique([projectId, userId])</span>
+                    <span class="field-desc">No duplicate memberships</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">Indexes</span>
+                    <span class="field-type">@@index([userId]), @@index([projectId])</span>
+                    <span class="field-desc">Fast lookups by user or project</span>
+                </div>
+            </div>
+
+            <h4>ProjectInvitations Table</h4>
+            <div class="table-schema">
+                <div class="field">
+                    <span class="field-name">id</span>
+                    <span class="field-type">String (PK)</span>
+                    <span class="field-desc">UUID</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">projectId</span>
+                    <span class="field-type">String (FK)</span>
+                    <span class="field-desc">Which project</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">email</span>
+                    <span class="field-type">String</span>
+                    <span class="field-desc">Email being invited</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">invitedByUserId</span>
+                    <span class="field-type">String (FK)</span>
+                    <span class="field-desc">Who sent the invitation</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">status</span>
+                    <span class="field-type">Enum</span>
+                    <span class="field-desc">"PENDING", "ACCEPTED", "DECLINED"</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">createdAt</span>
+                    <span class="field-type">DateTime</span>
+                    <span class="field-desc">Invitation timestamp</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">respondedAt</span>
+                    <span class="field-type">DateTime (nullable)</span>
+                    <span class="field-desc">When user accepted/declined</span>
+                </div>
+            </div>
+
+            <h4>Tasks Table</h4>
+            <div class="table-schema">
+                <div class="field">
+                    <span class="field-name">id</span>
+                    <span class="field-type">String (PK)</span>
+                    <span class="field-desc">UUID</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">projectId</span>
+                    <span class="field-type">String (FK)</span>
+                    <span class="field-desc">Which project</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">title</span>
+                    <span class="field-type">String</span>
+                    <span class="field-desc">Task name</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">description</span>
+                    <span class="field-type">String (nullable)</span>
+                    <span class="field-desc">Task details</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">status</span>
+                    <span class="field-type">Enum</span>
+                    <span class="field-desc">"TODO", "IN_PROGRESS", "DONE"</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">order</span>
+                    <span class="field-type">Int</span>
+                    <span class="field-desc">Position within status (see note below)</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">assignedToUserId</span>
+                    <span class="field-type">String (FK, nullable)</span>
+                    <span class="field-desc">Who it's assigned to</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">createdByUserId</span>
+                    <span class="field-type">String (FK)</span>
+                    <span class="field-desc">Who created it</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">createdAt, updatedAt</span>
+                    <span class="field-type">DateTime</span>
+                    <span class="field-desc">Timestamps</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">Compound Index</span>
+                    <span class="field-type">@@index([projectId, status, order])</span>
+                    <span class="field-desc">CRITICAL - for Kanban queries</span>
+                </div>
+            </div>
+
+            <div class="critical">
+                <strong>Task Ordering Fix:</strong> "order" field alone will break. Always query with: ORDER BY status, order. Without compound index, Kanban becomes slow with 100+ tasks.
+            </div>
+
+            <h4>ChatMessages Table</h4>
+            <div class="table-schema">
+                <div class="field">
+                    <span class="field-name">id</span>
+                    <span class="field-type">String (PK)</span>
+                    <span class="field-desc">UUID</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">projectId</span>
+                    <span class="field-type">String (FK)</span>
+                    <span class="field-desc">Which workspace</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">userId</span>
+                    <span class="field-type">String (FK)</span>
+                    <span class="field-desc">Who sent message</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">message</span>
+                    <span class="field-type">String</span>
+                    <span class="field-desc">Message content</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">createdAt</span>
+                    <span class="field-type">DateTime</span>
+                    <span class="field-desc">Send timestamp</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">Index</span>
+                    <span class="field-type">@@index([projectId]), @@index([createdAt])</span>
+                    <span class="field-desc">For polling queries and cleanup</span>
+                </div>
+            </div>
+
+            <h4>ActiveUsers Table</h4>
+            <div class="table-schema">
+                <div class="field">
+                    <span class="field-name">id</span>
+                    <span class="field-type">String (PK)</span>
+                    <span class="field-desc">UUID</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">projectId</span>
+                    <span class="field-type">String (FK)</span>
+                    <span class="field-desc">Which workspace</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">userId</span>
+                    <span class="field-type">String (FK)</span>
+                    <span class="field-desc">Which user</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">lastHeartbeat</span>
+                    <span class="field-type">DateTime</span>
+                    <span class="field-desc">Last seen timestamp</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">Unique constraint</span>
+                    <span class="field-type">@@unique([projectId, userId])</span>
+                    <span class="field-desc">One entry per user per project</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">Index</span>
+                    <span class="field-type">@@index([projectId])</span>
+                    <span class="field-desc">For cleanup queries</span>
+                </div>
+            </div>
+
+            <h3>Complete Prisma Schema Code</h3>
+            <div class="code-block">
+// schema.prisma
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+  
+  projectMembers ProjectMember[]
+  invitedBy      ProjectInvitation[] @relation("InvitedBy")
+  tasksCreated   Task[] @relation("CreatedBy")
+  tasksAssigned  Task[] @relation("AssignedTo")
+  chatMessages   ChatMessage[]
+}
+
+model Project {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  adminId     String
+  createdAt   DateTime @default(now())
+  
+  members       ProjectMember[]
+  invitations   ProjectInvitation[]
+  tasks         Task[]
+  chatMessages  ChatMessage[]
+  activeUsers   ActiveUser[]
+}
+
+model ProjectMember {
+  id        String   @id @default(uuid())
+  projectId String
+  userId    String
+  role      String   @default("MEMBER")
+  joinedAt  DateTime @default(now())
+  
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([projectId, userId])
+  @@index([userId])
+  @@index([projectId])
+}
+
+model ProjectInvitation {
+  id              String   @id @default(uuid())
+  projectId       String
+  email           String
+  invitedByUserId String
+  status          String   @default("PENDING")
+  createdAt       DateTime @default(now())
+  respondedAt     DateTime?
+  
+  project    Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  invitedBy  User    @relation("InvitedBy", fields: [invitedByUserId], references: [id])
+}
+
+model Task {
+  id              String   @id @default(uuid())
+  projectId       String
+  title           String
+  description     String?
+  status          String   @default("TODO")
+  order           Int      @default(0)
+  assignedToUserId String?
+  createdByUserId String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  project    Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  assignedTo User?   @relation("AssignedTo", fields: [assignedToUserId], references: [id])
+  createdBy  User    @relation("CreatedBy", fields: [createdByUserId], references: [id])
+  
+  @@index([projectId])
+  @@index([projectId, status, order])
+}
+
+model ChatMessage {
+  id        String   @id @default(uuid())
+  projectId String
+  userId    String
+  message   String
+  createdAt DateTime @default(now())
+  
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id])
+  
+  @@index([projectId])
+  @@index([createdAt])
+}
+
+model ActiveUser {
+  id            String   @id @default(uuid())
+  projectId     String
+  userId        String
+  lastHeartbeat DateTime @updatedAt
+  
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  
+  @@unique([projectId, userId])
+  @@index([projectId])
+}
+            </div>
+        </div>
+
+        <!-- SECTION 4: API ENDPOINTS & SECURITY -->
+        <div class="section" id="api">
+            <h2>4. API Endpoints & Security</h2>
+            
+            <h3>⚠️ CRITICAL Security Rule</h3>
+            <div class="critical">
+                When fetching a project, ALWAYS verify user is a member first!<br><br>
+                <strong>❌ WRONG:</strong><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;db.project.findUnique({ where: { id } })<br><br>
+                <strong>✅ CORRECT:</strong><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;db.projectMembers.findFirst({<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;where: { projectId: id, userId }<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;})<br><br>
+                Otherwise, users can guess project IDs and see private workspaces.
+            </div>
+
+            <h3>Projects API</h3>
+            
+            <div class="endpoint">
+                <span class="method get">GET</span> /api/projects?limit=20&cursor=...
+            </div>
+            <p>List projects user is member of. <strong>Pagination required for scalability.</strong> Returns: array of projects.</p>
+
+            <div class="endpoint">
+                <span class="method post">POST</span> /api/projects
+            </div>
+            <p>Create project. Body: {name, description}. User becomes admin. Returns: created project.</p>
+
+            <div class="endpoint">
+                <span class="method get">GET</span> /api/projects/[id]
+            </div>
+            <p><strong>MUST verify membership first.</strong> Returns: project + members.</p>
+
+            <div class="endpoint">
+                <span class="method delete">DELETE</span> /api/projects/[id]
+            </div>
+            <p>Delete project (admin only). Verify membership + admin role.</p>
+
+            <h3>Tasks API</h3>
+            
+            <div class="endpoint">
+                <span class="method get">GET</span> /api/projects/[id]/tasks
+            </div>
+            <p><strong>Query with:</strong> ORDER BY status, order. Verify membership.</p>
+
+            <div class="endpoint">
+                <span class="method post">POST</span> /api/projects/[id]/tasks
+            </div>
+            <p>Create task. Body: {title, description, assignedToUserId}. Verify membership.</p>
+
+            <div class="endpoint">
+                <span class="method put">PUT</span> /api/projects/[id]/tasks/[taskId]
+            </div>
+            <p>Update task. Body: {title, description, status, order, assignedToUserId}. Creator or admin only.</p>
+
+            <div class="endpoint">
+                <span class="method delete">DELETE</span> /api/projects/[id]/tasks/[taskId]
+            </div>
+            <p>Delete task (creator or admin).</p>
+
+            <h3>Invitations API (REVISED)</h3>
+            
+            <div class="endpoint">
+                <span class="method post">POST</span> /api/projects/[id]/invitations
+            </div>
+            <p>Send invitation. Body: {email}. Admin only.</p>
+
+            <div class="endpoint">
+                <span class="method get">GET</span> /api/invitations/pending
+            </div>
+            <p>Get pending invitations for current user.</p>
+
+            <div class="endpoint">
+                <span class="method patch">PATCH</span> /api/invitations/[id]
+            </div>
+            <p><strong>CLEANER API:</strong> Body: {status: "ACCEPTED" | "DECLINED"}. Updates invitation status and creates ProjectMember if accepted.</p>
+
+            <h3>Chat API (with Polling)</h3>
+            
+            <div class="endpoint">
+                <span class="method post">POST</span> /api/projects/[id]/chat
+            </div>
+            <p>Send message. Body: {message}. Verify membership. Returns: message object.</p>
+
+            <div class="endpoint">
+                <span class="method get">GET</span> /api/projects/[id]/chat/poll?since=ISO_TIMESTAMP
+            </div>
+            <p><strong>Poll for new data:</strong> Query param "since" to only get messages after timestamp. Returns: {messages, activeUsers, timestamp}.</p>
+
+            <div class="endpoint">
+                <span class="method post">POST</span> /api/projects/[id]/chat/heartbeat
+            </div>
+            <p>Keep user marked as active. Updates/creates ActiveUser entry. Every 30 seconds from client.</p>
+
+            <h3>Members API</h3>
+            
+            <div class="endpoint">
+                <span class="method get">GET</span> /api/projects/[id]/members
+            </div>
+            <p>List project members. Verify membership.</p>
+
+            <div class="endpoint">
+                <span class="method delete">DELETE</span> /api/projects/[id]/members/[userId]
+            </div>
+            <p>Remove member (admin only).</p>
+        </div>
+
+        <!-- SECTION 5: AUTHENTICATION & PERMISSIONS -->
+        <div class="section" id="clerk">
+            <h2>5. Authentication & Permissions</h2>
+            
+            <h3>Clerk Setup</h3>
+            <div class="code-block">
+npm install @clerk/nextjs
+
+// .env.local
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
+CLERK_SECRET_KEY=sk_test_...
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/dashboard
+NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/dashboard
+            </div>
+
+            <h3>Two-Layer Permission System</h3>
+            <div class="highlight">
+                <strong>Layer 1 - Authentication (Clerk):</strong> "Who are you?" - Clerk handles<br>
+                <strong>Layer 2 - Authorization (Database):</strong> "What can you do?" - ProjectMembers table handles
+            </div>
+
+            <h3>Permission Checks (Backend)</h3>
+            <div class="code-block">
+// lib/auth.ts
+export async function getAuth() {
+  const { userId } = auth() // From Clerk
+  if (!userId) throw new Error('Unauthorized')
+  return userId
+}
+
+export async function isProjectMember(projectId: string, userId: string) {
+  return db.projectMembers.findFirst({
+    where: { projectId, userId }
+  })
+}
+
+export async function isProjectAdmin(projectId: string, userId: string) {
+  return db.projectMembers.findFirst({
+    where: { projectId, userId, role: 'ADMIN' }
+  })
+}
+
+// Usage in API route:
+export async function DELETE(req, { params }) {
+  const userId = await getAuth()
+  
+  // Security check: user must be admin
+  const isAdmin = await isProjectAdmin(params.id, userId)
+  if (!isAdmin) {
+    return Response.json({ error: 'Forbidden' }, { status: 403 })
+  }
+  
+  // Safe to delete
+}
+            </div>
+
+            <h3>Permission Matrix</h3>
+            <table>
+                <tr>
+                    <th>Action</th>
+                    <th>Admin</th>
+                    <th>Member</th>
+                    <th>Non-member</th>
+                </tr>
+                <tr>
+                    <td>View project</td>
+                    <td>✓</td>
+                    <td>✓</td>
+                    <td>✗</td>
+                </tr>
+                <tr>
+                    <td>Create task</td>
+                    <td>✓</td>
+                    <td>✓</td>
+                    <td>✗</td>
+                </tr>
+                <tr>
+                    <td>Edit own task</td>
+                    <td>✓</td>
+                    <td>✓</td>
+                    <td>✗</td>
+                </tr>
+                <tr>
+                    <td>Edit any task</td>
+                    <td>✓</td>
+                    <td>✗</td>
+                    <td>✗</td>
+                </tr>
+                <tr>
+                    <td>Invite members</td>
+                    <td>✓</td>
+                    <td>✗</td>
+                    <td>✗</td>
+                </tr>
+                <tr>
+                    <td>Remove members</td>
+                    <td>✓</td>
+                    <td>✗</td>
+                    <td>✗</td>
+                </tr>
+                <tr>
+                    <td>Delete project</td>
+                    <td>✓</td>
+                    <td>✗</td>
+                    <td>✗</td>
+                </tr>
+                <tr>
+                    <td>Send chat message</td>
+                    <td>✓</td>
+                    <td>✓</td>
+                    <td>✗</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- SECTION 6: SERVICE LAYER -->
+        <div class="section" id="services">
+            <h2>6. Service Layer Architecture</h2>
+            
+            <h3>Why Services?</h3>
+            <p>Keep API routes thin. Business logic goes in services.</p>
+
+            <h3>Folder Structure</h3>
+            <div class="code-block">
+lib/services/
+├── project.service.ts      (create, delete, list, getMembers)
+├── task.service.ts         (create, update, delete, list)
+├── invitation.service.ts   (send, accept, decline, list)
+├── chat.service.ts         (send, poll, cleanup)
+└── auth.service.ts         (verify membership, verify admin)
+            </div>
+
+            <h3>Example Service</h3>
+            <div class="code-block">
+// lib/services/task.service.ts
+import { db } from '@/lib/db'
+
+export async function getProjectTasks(
+  projectId: string,
+  userId: string
+) {
+  // Verify membership
+  await verifyProjectMembership(projectId, userId)
+  
+  // Get tasks ordered correctly
+  return db.task.findMany({
+    where: { projectId },
+    orderBy: [
+      { status: 'asc' },
+      { order: 'asc' }
+    ]
+  })
+}
+
+export async function updateTask(
+  projectId: string,
+  taskId: string,
+  userId: string,
+  data: any
+) {
+  // Verify membership
+  await verifyProjectMembership(projectId, userId)
+  
+  // Check if user is creator or admin
+  const task = await db.task.findUnique({ where: { id: taskId } })
+  const isAdmin = await isProjectAdmin(projectId, userId)
+  
+  if (task.createdByUserId !== userId && !isAdmin) {
+    throw new Error('Unauthorized')
+  }
+  
+  // Safe to update
+  return db.task.update({
+    where: { id: taskId },
+    data
+  })
+}
+
+async function verifyProjectMembership(projectId: string, userId: string) {
+  const member = await db.projectMember.findFirst({
+    where: { projectId, userId }
+  })
+  
+  if (!member) throw new Error('Not a member')
+}
+
+async function isProjectAdmin(projectId: string, userId: string) {
+  const member = await db.projectMember.findFirst({
+    where: { projectId, userId, role: 'ADMIN' }
+  })
+  
+  return !!member
+}
+            </div>
+
+            <h3>Example API Route</h3>
+            <div class="code-block">
+// app/api/projects/[id]/tasks/[taskId]/route.ts
+import { auth } from '@clerk/nextjs'
+import { updateTask } from '@/lib/services/task.service'
+
+export async function PUT(req, { params }) {
+  try {
+    const { userId } = auth()
+    if (!userId) return Response.json({ error: 'Unauthorized' }, { status: 401 })
+    
+    const data = await req.json()
+    
+    const task = await updateTask(
+      params.id,
+      params.taskId,
+      userId,
+      data
+    )
+    
+    return Response.json(task)
+  } catch (error) {
+    return Response.json(
+      { error: error.message },
+      { status: 403 }
+    )
+  }
+}
+            </div>
+
+            <p><strong>Benefit:</strong> API routes stay clean. All security checks and business logic in one place. Easy to test.</p>
+        </div>
+
+        <!-- SECTION 7: FRONTEND ARCHITECTURE -->
+        <div class="section" id="frontend">
+            <h2>7. Frontend Architecture</h2>
+            
+            <h3>Polling Hooks</h3>
+            
+            <h4>useChat Hook</h4>
+            <div class="code-block">
+// hooks/useChat.ts
+export function useChat(projectId: string) {
+  const [messages, setMessages] = useState([])
+  const [activeUsers, setActiveUsers] = useState([])
+  const [lastPollTime, setLastPollTime] = useState(new Date())
+  
+  // Poll every 2 seconds
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      const response = await fetch(
+        `/api/projects/${projectId}/chat/poll?since=${lastPollTime.toISOString()}`
+      )
+      const data = await response.json()
+      
+      if (data.messages.length > 0) {
+        setMessages(prev => [...prev, ...data.messages])
+      }
+      
+      setActiveUsers(data.activeUsers)
+      setLastPollTime(new Date(data.timestamp))
+    }, 2000)
+    
+    return () => clearInterval(interval)
+  }, [projectId])
+  
+  // Heartbeat every 30 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetch(`/api/projects/${projectId}/chat/heartbeat`, {
+        method: 'POST'
+      })
+    }, 30000)
+    
+    return () => clearInterval(interval)
+  }, [projectId])
+  
+  return { messages, activeUsers }
+}
+            </div>
+
+            <h4>useKanban Hook</h4>
+            <div class="code-block">
+// hooks/useKanban.ts
+export function useKanban(projectId: string) {
+  const [tasks, setTasks] = useState([])
+  
+  // Poll every 4 seconds
+  useEffect(() => {
+    const poll = async () => {
+      const response = await fetch(`/api/projects/${projectId}/tasks`)
+      const data = await response.json()
+      setTasks(data)
+    }
+    
+    poll() // Initial fetch
+    const interval = setInterval(poll, 4000)
+    
+    return () => clearInterval(interval)
+  }, [projectId])
+  
+  return tasks
+}
+            </div>
+
+            <h3>Component Structure</h3>
+            <ul>
+                <li><code>components/dashboard/</code> - Projects list, create project modal</li>
+                <li><code>components/kanban/</code> - Board, columns, task cards, drag-drop</li>
+                <li><code>components/chat/</code> - Message list, input, active users</li>
+                <li><code>components/shared/</code> - Buttons, modals, common UI</li>
+            </ul>
+        </div>
+
+        <!-- SECTION 8: DEVELOPMENT ROADMAP -->
+        <div class="section" id="roadmap">
+            <h2>8. Development Roadmap (Realistic 3 Weeks)</h2>
+            
+            <div class="highlight">
+                <strong>Realistic Timeline:</strong><br>
+                Week 1: Infrastructure + Projects<br>
+                Week 2: Kanban board<br>
+                Week 3: Chat + polish + deploy
+            </div>
+
+            <h3>Week 1: Foundation</h3>
+            
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-marker">1</div>
+                    <div class="timeline-content">
+                        <h4>Days 1-2: Setup</h4>
+                        <ul>
+                            <li>Create Next.js project</li>
+                            <li>Setup PostgreSQL + Prisma locally</li>
+                            <li>Integrate Clerk auth</li>
+                            <li>Create Prisma schema with all indexes</li>
+                            <li>Test db migrations</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-marker">2</div>
+                    <div class="timeline-content">
+                        <h4>Days 3-4: Dashboard</h4>
+                        <ul>
+                            <li>Build /dashboard layout</li>
+                            <li>Implement GET /api/projects (with pagination)</li>
+                            <li>Build project cards</li>
+                            <li>Create ProjectProvider context</li>
+                            <li>Test project listing</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-marker">3</div>
+                    <div class="timeline-content">
+                        <h4>Days 5-6: Projects & Invitations</h4>
+                        <ul>
+                            <li>Build "Create Project" modal + API</li>
+                            <li>Build invite modal + API</li>
+                            <li>Implement invitation list on dashboard</li>
+                            <li>Build accept/decline endpoints</li>
+                            <li>Test full invitation flow</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-marker">4</div>
+                    <div class="timeline-content">
+                        <h4>Days 7: Buffer & Testing</h4>
+                        <ul>
+                            <li>Test signup → create project → invite flow</li>
+                            <li>Fix bugs</li>
+                            <li>Add error handling</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <h3>Week 2: Kanban Board</h3>
+            
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-marker">5</div>
+                    <div class="timeline-content">
+                        <h4>Days 8-9: Board Layout & Queries</h4>
+                        <ul>
+                            <li>Build /projects/[id]/board page</li>
+                            <li>Implement GET /api/projects/[id]/tasks with proper ordering</li>
+                            <li>Build TaskColumn components</li>
+                            <li>Build TaskCard components</li>
+                            <li>Test task fetching and display</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-marker">6</div>
+                    <div class="timeline-content">
+                        <h4>Days 10-11: Drag-Drop (takes longer than expected)</h4>
+                        <ul>
+                            <li>Install @dnd-kit/core</li>
+                            <li>Setup drag-drop handlers</li>
+                            <li>Implement optimistic updates</li>
+                            <li>Implement PUT /api/tasks/[id]</li>
+                            <li>Test drag between columns</li>
+                            <li>Test drag within column</li>
+                            <li>Fix edge cases (slow!)</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-marker">7</div>
+                    <div class="timeline-content">
+                        <h4>Days 12-13: Task CRUD</h4>
+                        <ul>
+                            <li>Build task creation modal</li>
+                            <li>Build task edit modal</li>
+                            <li>Implement POST /api/tasks</li>
+                            <li>Implement DELETE /api/tasks</li>
+                            <li>Add assignee selector</li>
+                            <li>Test full Kanban workflow</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-marker">8</div>
+                    <div class="timeline-content">
+                        <h4>Day 14: Kanban Polish</h4>
+                        <ul>
+                            <li>Test with 2+ users</li>
+                            <li>Verify polling sync works</li>
+                            <li>Fix any race conditions</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <h3>Week 3: Chat & Deploy</h3>
+            
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-marker">9</div>
+                    <div class="timeline-content">
+                        <h4>Days 15-16: Live Chat</h4>
+                        <ul>
+                            <li>Build ChatPanel component</li>
+                            <li>Implement POST /api/projects/[id]/chat</li>
+                            <li>Implement GET /api/projects/[id]/chat/poll</li>
+                            <li>Create ActiveUsers table + heartbeat</li>
+                            <li>Build useChat hook with polling</li>
+                            <li>Test real-time messaging</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-marker">10</div>
+                    <div class="timeline-content">
+                        <h4>Days 17-18: Cleanup & Polish</h4>
+                        <ul>
+                            <li>Add cleanup job for inactive workspaces</li>
+                            <li>Test ephemeral chat (messages vanish)</li>
+                            <li>Add active user display in chat</li>
+                            <li>Fix bugs found in testing</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-marker">11</div>
+                    <div class="timeline-content">
+                        <h4>Days 19-20: Testing & Bug Fixes</h4>
+                        <ul>
+                            <li>Full end-to-end testing</li>
+                            <li>Test with 3+ concurrent users</li>
+                            <li>Test browser crashes/refreshes</li>
+                            <li>Fix edge cases</li>
+                            <li>Add error boundaries</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-marker">12</div>
+                    <div class="timeline-content">
+                        <h4>Day 21: Deployment</h4>
+                        <ul>
+                            <li>Create GitHub repo</li>
+                            <li>Deploy to Vercel (frontend)</li>
+                            <li>Deploy to Railway (database)</li>
+                            <li>Setup environment variables</li>
+                            <li>Test production</li>
+                            <li>Write README</li>
+                            <li>Deploy! 🚀</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <h3>Why 3 Weeks is Realistic</h3>
+            <ul>
+                <li><strong>Drag-drop always takes longer than expected</strong> - Edge cases with reordering are tricky</li>
+                <li><strong>Security checks take time</strong> - Every endpoint needs verification</li>
+                <li><strong>Real-time polling needs testing</strong> - Race conditions with concurrent users</li>
+                <li><strong>Deployment surprises</strong> - Environment config, database migrations in production</li>
+            </ul>
+
+            <h3>MVP Checklist</h3>
+            <ul class="feature-list">
+                <li>User signup/login (Clerk)</li>
+                <li>Create projects</li>
+                <li>Invite members by email</li>
+                <li>Accept/decline invitations</li>
+                <li>Kanban board (3 columns)</li>
+                <li>Create/edit/delete tasks</li>
+                <li>Assign tasks</li>
+                <li>Real-time task sync (polling)</li>
+                <li>Live chat with polling</li>
+                <li>Active user tracking</li>
+                <li>Ephemeral messages (auto-delete)</li>
+                <li>Member management (admin only)</li>
+                <li>All security checks in place</li>
+            </ul>
+        </div>
+
+        <!-- CLOSING -->
+        <div class="section">
+            <h2>Summary</h2>
+            
+            <div class="success">
+                <h3>You're Ready to Build 🚀</h3>
+                <p>This document is corrected for production-level architecture. Follow it, and you'll have a solid, secure MVP in 3 weeks.</p>
+                <p><strong>Key Points:</strong></p>
+                <ul>
+                    <li>No "broadcast" language - polling is request/response only</li>
+                    <li>Heartbeat cleanup, not "last user leaves"</li>
+                    <li>Security checks on every endpoint</li>
+                    <li>Proper database indexes for performance</li>
+                    <li>Service layer keeps API routes clean</li>
+                    <li>Realistic timeline with buffer</li>
+                </ul>
+            </div>
+
+            <h3>Resources</h3>
+            <ul>
+                <li><strong>Next.js:</strong> https://nextjs.org/docs</li>
+                <li><strong>Prisma:</strong> https://www.prisma.io/docs</li>
+                <li><strong>Clerk:</strong> https://clerk.com/docs</li>
+                <li><strong>@dnd-kit:</strong> https://docs.dndkit.com</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
