@@ -1,0 +1,125 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  clerkId   String   @unique
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+
+  projectMembers    ProjectMember[]
+  invitationsSent   ProjectInvitation[] @relation("InvitedBy")
+  tasksCreated      Task[]              @relation("CreatedBy")
+  tasksAssigned     Task[]              @relation("AssignedTo")
+  chatMessages      ChatMessage[]
+
+  @@index([clerkId])
+  @@index([email])
+}
+
+model Project {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  adminId     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  members      ProjectMember[]
+  invitations  ProjectInvitation[]
+  tasks        Task[]
+  chatMessages ChatMessage[]
+  activeUsers  ActiveUser[]
+}
+
+model ProjectMember {
+  id        String   @id @default(uuid())
+  projectId String
+  userId    String
+  role      String   @default("MEMBER")
+  joinedAt  DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, userId])
+  @@index([userId])
+  @@index([projectId])
+}
+
+model ProjectInvitation {
+  id              String    @id @default(uuid())
+  projectId       String
+  email           String
+  invitedByUserId String
+  status          String    @default("PENDING")
+  createdAt       DateTime  @default(now())
+  respondedAt     DateTime?
+
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  invitedBy User    @relation("InvitedBy", fields: [invitedByUserId], references: [id])
+
+  @@index([email])
+  @@index([projectId])
+  @@index([status])
+}
+
+model Task {
+  id               String   @id @default(uuid())
+  projectId        String
+  title            String
+  description      String?
+  status           String   @default("TODO")
+  order            Int      @default(0)
+  assignedToUserId String?
+  createdByUserId  String
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  project    Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  assignedTo User?   @relation("AssignedTo", fields: [assignedToUserId], references: [id])
+  createdBy  User    @relation("CreatedBy", fields: [createdByUserId], references: [id])
+
+  @@index([projectId])
+  @@index([projectId, status, order])
+}
+
+model ChatMessage {
+  id        String   @id @default(uuid())
+  projectId String
+  userId    String
+  message   String
+  createdAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id])
+
+  @@index([projectId])
+  @@index([createdAt])
+  @@index([projectId, createdAt])
+}
+
+model ActiveUser {
+  id            String   @id @default(uuid())
+  projectId     String
+  userId        String
+  lastHeartbeat DateTime @default(now()) @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, userId])
+  @@index([projectId])
+  @@index([lastHeartbeat])
+}
