@@ -73,6 +73,7 @@ export default async function BoardPage({
                     <KanbanBoard
                         projectId={project.id}
                         currentUserId={dbUser.id}
+                        isAdmin={isAdmin}
                         initialTasks={tasks as any}
                     />
                 </div>

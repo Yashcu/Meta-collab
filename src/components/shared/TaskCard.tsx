@@ -1,9 +1,5 @@
 'use client'
 
-import { Badge } from '@/components/ui/badge'
-
-type User = { id: string; name: string | null; email: string }
-
 export type Task = {
     id: string
     title: string
@@ -11,8 +7,8 @@ export type Task = {
     status: string
     order: number
     projectId: string
-    assignedTo: User | null
-    createdBy: User
+    assignedTo: { id: string; name: string | null; email: string } | null
+    createdBy: { id: string; name: string | null; email: string }
     createdAt: string
     updatedAt: string
 }
@@ -20,18 +16,21 @@ export type Task = {
 export function TaskCard({
     task,
     currentUserId,
+    isAdmin,
     onEdit,
     onDelete,
 }: {
     task: Task
     currentUserId: string
+    isAdmin: boolean
     onEdit: (task: Task) => void
     onDelete: (taskId: string) => void
 }) {
-    const canEdit = task.createdBy.id === currentUserId
-    const canDelete = task.createdBy.id === currentUserId
+    const isCreator = task.createdBy.id === currentUserId
+    const canEdit = isCreator || isAdmin
+    const canDelete = isCreator || isAdmin
 
-    function getInitials(user: User) {
+    function getInitials(user: { name: string | null; email: string }) {
         if (user.name) {
             return user.name
                 .split(' ')
@@ -45,7 +44,9 @@ export function TaskCard({
 
     return (
         <div
-            className={`bg-white border border-slate-200 rounded-lg p-3 shadow-sm transition-shadow group ${canEdit ? 'cursor-pointer hover:shadow-md' : 'cursor-default'
+            className={`bg-white border border-slate-200 rounded-lg p-3 shadow-sm transition-shadow group ${canEdit
+                    ? 'cursor-pointer hover:shadow-md'
+                    : 'cursor-default opacity-90'
                 }`}
             onClick={() => canEdit && onEdit(task)}
         >
@@ -59,7 +60,7 @@ export function TaskCard({
                             e.stopPropagation()
                             onDelete(task.id)
                         }}
-                        className="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-red-400 transition-all text-lg leading-none shrink-0"
+                        className="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-red-400 transition-all text-lg leading-none shrink-0 w-5 h-5 flex items-center justify-center"
                         title="Delete task"
                     >
                         ×
@@ -68,7 +69,7 @@ export function TaskCard({
             </div>
 
             {task.description && (
-                <p className="text-xs text-slate-400 mt-1 line-clamp-2">
+                <p className="text-xs text-slate-400 mt-1.5 line-clamp-2 leading-relaxed">
                     {task.description}
                 </p>
             )}
@@ -79,8 +80,8 @@ export function TaskCard({
                 </span>
                 {task.assignedTo && (
                     <div
-                        className="w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-xs font-medium flex items-center justify-center"
-                        title={task.assignedTo.name || task.assignedTo.email}
+                        className="w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-xs font-medium flex items-center justify-center shrink-0"
+                        title={`Assigned to ${task.assignedTo.name || task.assignedTo.email}`}
                     >
                         {getInitials(task.assignedTo)}
                     </div>

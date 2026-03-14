@@ -12,6 +12,7 @@ export function TaskColumn({
     status,
     tasks,
     currentUserId,
+    isAdmin,
     onAddTask,
     onEditTask,
     onDeleteTask,
@@ -19,6 +20,7 @@ export function TaskColumn({
     status: 'TODO' | 'IN_PROGRESS' | 'DONE'
     tasks: Task[]
     currentUserId: string
+    isAdmin: boolean
     onAddTask: (status: string) => void
     onEditTask: (task: Task) => void
     onDeleteTask: (taskId: string) => void
@@ -27,36 +29,38 @@ export function TaskColumn({
 
     return (
         <div className="flex flex-col bg-slate-100 rounded-xl p-3 min-h-[500px]">
-            {/* Column header */}
             <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
-                    <span className={`text-xs font-semibold px-2 py-1 rounded-full ${config.color}`}>
+                    <span
+                        className={`text-xs font-semibold px-2 py-1 rounded-full ${config.color}`}
+                    >
                         {config.label}
                     </span>
-                    <span className="text-xs font-medium text-slate-400">{tasks.length}</span>
+                    <span className="text-xs font-medium text-slate-400">
+                        {tasks.length}
+                    </span>
                 </div>
                 <button
                     onClick={() => onAddTask(status)}
                     className="w-6 h-6 flex items-center justify-center rounded-md text-slate-400 hover:bg-slate-200 hover:text-slate-600 transition-colors text-lg font-light"
-                    title={`Add task`}
+                    title="Add task"
                 >
                     +
                 </button>
             </div>
 
-            {/* Task cards */}
             <div className="flex flex-col gap-2 flex-1">
                 {tasks.map((task) => (
                     <TaskCard
                         key={task.id}
                         task={task}
                         currentUserId={currentUserId}
+                        isAdmin={isAdmin}
                         onEdit={onEditTask}
                         onDelete={onDeleteTask}
                     />
                 ))}
 
-                {/* Empty state */}
                 {tasks.length === 0 && (
                     <button
                         onClick={() => onAddTask(status)}

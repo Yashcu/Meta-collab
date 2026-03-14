@@ -11,10 +11,12 @@ type Member = { id: string; name: string | null; email: string; role: string }
 export function KanbanBoard({
     projectId,
     currentUserId,
+    isAdmin,
     initialTasks,
 }: {
     projectId: string
     currentUserId: string
+    isAdmin: boolean
     initialTasks: Task[]
 }) {
     const [tasks, setTasks] = useState<Task[]>(initialTasks)
@@ -22,7 +24,6 @@ export function KanbanBoard({
     const [addingToStatus, setAddingToStatus] = useState<string | null>(null)
     const [editingTask, setEditingTask] = useState<Task | null>(null)
 
-    // Poll for task updates every 5 seconds
     const pollTasks = useCallback(async () => {
         try {
             const res = await fetch(`/api/projects/${projectId}/tasks`)
@@ -30,11 +31,10 @@ export function KanbanBoard({
             const data = await res.json()
             setTasks(data.tasks)
         } catch {
-            // Silent fail
+            // silent fail
         }
     }, [projectId])
 
-    // Fetch members once on mount
     useEffect(() => {
         async function fetchMembers() {
             try {
@@ -82,6 +82,7 @@ export function KanbanBoard({
                         status={status}
                         tasks={getTasksByStatus(status)}
                         currentUserId={currentUserId}
+                        isAdmin={isAdmin}
                         onAddTask={(s) => setAddingToStatus(s)}
                         onEditTask={(task) => setEditingTask(task)}
                         onDeleteTask={handleDeleteTask}
@@ -119,7 +120,6 @@ export function KanbanBoard({
         </>
     )
 }
-
 
 function AddTaskModal({
     projectId,
@@ -185,7 +185,8 @@ function AddTaskModal({
                         </div>
                         <div>
                             <label className="text-xs font-medium text-slate-500 mb-1 block">
-                                Description <span className="font-normal text-slate-400">(optional)</span>
+                                Description{' '}
+                                <span className="font-normal text-slate-400">(optional)</span>
                             </label>
                             <textarea
                                 className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
@@ -197,7 +198,8 @@ function AddTaskModal({
                         </div>
                         <div>
                             <label className="text-xs font-medium text-slate-500 mb-1 block">
-                                Assign to <span className="font-normal text-slate-400">(optional)</span>
+                                Assign to{' '}
+                                <span className="font-normal text-slate-400">(optional)</span>
                             </label>
                             <select
                                 className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
@@ -308,7 +310,8 @@ function EditTaskModal({
                         </div>
                         <div>
                             <label className="text-xs font-medium text-slate-500 mb-1 block">
-                                Description <span className="font-normal text-slate-400">(optional)</span>
+                                Description{' '}
+                                <span className="font-normal text-slate-400">(optional)</span>
                             </label>
                             <textarea
                                 className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
@@ -332,7 +335,8 @@ function EditTaskModal({
                         </div>
                         <div>
                             <label className="text-xs font-medium text-slate-500 mb-1 block">
-                                Assign to <span className="font-normal text-slate-400">(optional)</span>
+                                Assign to{' '}
+                                <span className="font-normal text-slate-400">(optional)</span>
                             </label>
                             <select
                                 className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
