@@ -6,6 +6,8 @@ import { Task } from './TaskCard'
 
 const STATUSES = ['TODO', 'IN_PROGRESS', 'DONE'] as const
 
+type Member = { id: string; name: string | null; email: string; role: string }
+
 export function KanbanBoard({
     projectId,
     currentUserId,
@@ -16,6 +18,7 @@ export function KanbanBoard({
     initialTasks: Task[]
 }) {
     const [tasks, setTasks] = useState<Task[]>(initialTasks)
+    const [members, setMembers] = useState<Member[]>([])
     const [addingToStatus, setAddingToStatus] = useState<string | null>(null)
     const [editingTask, setEditingTask] = useState<Task | null>(null)
 
@@ -27,8 +30,23 @@ export function KanbanBoard({
             const data = await res.json()
             setTasks(data.tasks)
         } catch {
-            // Silent fail on poll — don't disrupt the user
+            // Silent fail
         }
+    }, [projectId])
+
+    // Fetch members once on mount
+    useEffect(() => {
+        async function fetchMembers() {
+            try {
+                const res = await fetch(`/api/projects/${projectId}/members`)
+                if (!res.ok) return
+                const data = await res.json()
+                setMembers(data.members)
+            } catch {
+                // silent fail
+            }
+        }
+        fetchMembers()
     }, [projectId])
 
     useEffect(() => {
@@ -43,18 +61,13 @@ export function KanbanBoard({
     }
 
     async function handleDeleteTask(taskId: string) {
-        // Optimistic update
         setTasks((prev) => prev.filter((t) => t.id !== taskId))
-
         try {
             const res = await fetch(
                 `/api/projects/${projectId}/tasks/${taskId}`,
                 { method: 'DELETE' }
             )
-            if (!res.ok) {
-                // Revert on failure
-                await pollTasks()
-            }
+            if (!res.ok) await pollTasks()
         } catch {
             await pollTasks()
         }
@@ -80,6 +93,7 @@ export function KanbanBoard({
                 <AddTaskModal
                     projectId={projectId}
                     status={addingToStatus}
+                    members={members}
                     onClose={() => setAddingToStatus(null)}
                     onCreated={(task) => {
                         setTasks((prev) => [...prev, task])
@@ -92,6 +106,7 @@ export function KanbanBoard({
                 <EditTaskModal
                     projectId={projectId}
                     task={editingTask}
+                    members={members}
                     onClose={() => setEditingTask(null)}
                     onUpdated={(updated) => {
                         setTasks((prev) =>
@@ -105,19 +120,23 @@ export function KanbanBoard({
     )
 }
 
+
 function AddTaskModal({
     projectId,
     status,
+    members,
     onClose,
     onCreated,
 }: {
     projectId: string
     status: string
+    members: Member[]
     onClose: () => void
     onCreated: (task: Task) => void
 }) {
     const [title, setTitle] = useState('')
     const [description, setDescription] = useState('')
+    const [assignedToUserId, setAssignedToUserId] = useState('')
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
 
@@ -129,7 +148,11 @@ function AddTaskModal({
             const res = await fetch(`/api/projects/${projectId}/tasks`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ title, description }),
+                body: JSON.stringify({
+                    title,
+                    description,
+                    assignedToUserId: assignedToUserId || undefined,
+                }),
             })
             const data = await res.json()
             if (!res.ok) { setError(data.error || 'Failed to create task'); return }
@@ -144,11 +167,9 @@ function AddTaskModal({
     return (
         <ModalBackdrop onClose={onClose}>
             <div className="bg-white rounded-xl w-full max-w-md shadow-xl flex flex-col max-h-[90vh]">
-                {/* Header */}
                 <div className="px-6 pt-6 pb-4 border-b border-slate-100">
                     <h2 className="text-base font-semibold text-slate-900">Add task</h2>
                 </div>
-
                 <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
                     <div className="flex-1 overflow-y-auto px-6 py-4 space-y-3">
                         <div>
@@ -171,13 +192,29 @@ function AddTaskModal({
                                 placeholder="Add more details..."
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
-                                rows={4}
+                                rows={3}
                             />
+                        </div>
+                        <div>
+                            <label className="text-xs font-medium text-slate-500 mb-1 block">
+                                Assign to <span className="font-normal text-slate-400">(optional)</span>
+                            </label>
+                            <select
+                                className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                                value={assignedToUserId}
+                                onChange={(e) => setAssignedToUserId(e.target.value)}
+                            >
+                                <option value="">Unassigned</option>
+                                {members.map((m) => (
+                                    <option key={m.id} value={m.id}>
+                                        {m.name || m.email}
+                                        {m.role === 'ADMIN' ? ' (Admin)' : ''}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
                         {error && <p className="text-xs text-red-500">{error}</p>}
                     </div>
-
-                    {/* Footer — always visible */}
                     <div className="px-6 py-4 border-t border-slate-100 flex justify-end gap-2 bg-white rounded-b-xl">
                         <button
                             type="button"
@@ -203,17 +240,22 @@ function AddTaskModal({
 function EditTaskModal({
     projectId,
     task,
+    members,
     onClose,
     onUpdated,
 }: {
     projectId: string
     task: Task
+    members: Member[]
     onClose: () => void
     onUpdated: (task: Task) => void
 }) {
     const [title, setTitle] = useState(task.title)
     const [description, setDescription] = useState(task.description || '')
     const [status, setStatus] = useState(task.status)
+    const [assignedToUserId, setAssignedToUserId] = useState(
+        task.assignedTo?.id || ''
+    )
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
 
@@ -227,7 +269,12 @@ function EditTaskModal({
                 {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ title, description, status }),
+                    body: JSON.stringify({
+                        title,
+                        description,
+                        status,
+                        assignedToUserId: assignedToUserId || null,
+                    }),
                 }
             )
             const data = await res.json()
@@ -243,12 +290,9 @@ function EditTaskModal({
     return (
         <ModalBackdrop onClose={onClose}>
             <div className="bg-white rounded-xl w-full max-w-md shadow-xl flex flex-col max-h-[90vh]">
-                {/* Header */}
                 <div className="px-6 pt-6 pb-4 border-b border-slate-100">
                     <h2 className="text-base font-semibold text-slate-900">Edit task</h2>
                 </div>
-
-                {/* Scrollable body */}
                 <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
                     <div className="flex-1 overflow-y-auto px-6 py-4 space-y-3">
                         <div>
@@ -271,7 +315,7 @@ function EditTaskModal({
                                 placeholder="Add more details..."
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
-                                rows={4}
+                                rows={3}
                             />
                         </div>
                         <div>
@@ -286,10 +330,26 @@ function EditTaskModal({
                                 <option value="DONE">Done</option>
                             </select>
                         </div>
+                        <div>
+                            <label className="text-xs font-medium text-slate-500 mb-1 block">
+                                Assign to <span className="font-normal text-slate-400">(optional)</span>
+                            </label>
+                            <select
+                                className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                                value={assignedToUserId}
+                                onChange={(e) => setAssignedToUserId(e.target.value)}
+                            >
+                                <option value="">Unassigned</option>
+                                {members.map((m) => (
+                                    <option key={m.id} value={m.id}>
+                                        {m.name || m.email}
+                                        {m.role === 'ADMIN' ? ' (Admin)' : ''}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
                         {error && <p className="text-xs text-red-500">{error}</p>}
                     </div>
-
-                    {/* Footer — always visible */}
                     <div className="px-6 py-4 border-t border-slate-100 flex justify-end gap-2 bg-white rounded-b-xl">
                         <button
                             type="button"
