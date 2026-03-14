@@ -11,7 +11,10 @@ type ChatMessage = {
     user: User
 }
 
-export function useChat(projectId: string) {
+export function useChat(
+    projectId: string,
+    currentUser: { id: string; name: string | null; email: string }
+) {
     const [messages, setMessages] = useState<ChatMessage[]>([])
     const [activeUsers, setActiveUsers] = useState<User[]>([])
     const [sending, setSending] = useState(false)
@@ -22,7 +25,9 @@ export function useChat(projectId: string) {
     const poll = useCallback(async () => {
         try {
             const url = timestampRef.current
-                ? `/api/projects/${projectId}/chat/poll?since=${encodeURIComponent(timestampRef.current)}`
+                ? `/api/projects/${projectId}/chat/poll?since=${encodeURIComponent(
+                    timestampRef.current
+                )}`
                 : `/api/projects/${projectId}/chat/poll`
 
             const res = await fetch(url)
@@ -63,14 +68,9 @@ export function useChat(projectId: string) {
     }, [projectId])
 
     useEffect(() => {
-        // Initial poll + heartbeat
         poll()
         sendHeartbeat()
-
-        // Poll every 2 seconds
         pollIntervalRef.current = setInterval(poll, 2000)
-
-        // Heartbeat every 30 seconds
         heartbeatIntervalRef.current = setInterval(sendHeartbeat, 30000)
 
         return () => {
@@ -83,13 +83,12 @@ export function useChat(projectId: string) {
         if (!text.trim() || sending) return false
         setSending(true)
 
-        // Optimistic update — add message locally immediately
         const optimisticId = `optimistic-${Date.now()}`
         const optimisticMessage: ChatMessage = {
             id: optimisticId,
             message: text.trim(),
             createdAt: new Date().toISOString(),
-            user: { id: 'me', name: 'You', email: '' },
+            user: currentUser,
         }
         setMessages((prev) => [...prev, optimisticMessage])
 
@@ -101,14 +100,12 @@ export function useChat(projectId: string) {
             })
 
             if (!res.ok) {
-                // Remove optimistic message on failure
                 setMessages((prev) => prev.filter((m) => m.id !== optimisticId))
                 return false
             }
 
             const data = await res.json()
 
-            // Replace optimistic message with real one
             setMessages((prev) =>
                 prev.map((m) => (m.id === optimisticId ? data.message : m))
             )

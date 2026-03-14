@@ -85,7 +85,11 @@ export default async function BoardPage({
 
             <ChatPanel
                 projectId={project.id}
-                currentUserId={dbUser.id}
+                currentUser={{
+                    id: dbUser.id,
+                    name: dbUser.name,
+                    email: dbUser.email,
+                }}
             />
         </div>
     )
