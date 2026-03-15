@@ -9,12 +9,12 @@ function getInitials(user: { name: string | null; email: string }) {
     if (user.name) {
         return user.name
             .split(' ')
-            .map((n) => n[0])
+            .map((n) => n[0] ?? '')
             .join('')
             .toUpperCase()
             .slice(0, 2)
     }
-    return user.email[0].toUpperCase()
+    return (user.email[0] ?? '?').toUpperCase()
 }
 
 export function ChatPanel({
@@ -211,8 +211,8 @@ export function ChatPanel({
                                                         </span>
                                                         <div
                                                             className={`px-3 py-2 rounded-2xl text-sm max-w-[85%] break-words leading-relaxed ${isOwn
-                                                                    ? 'bg-blue-600 text-white rounded-br-sm'
-                                                                    : 'bg-slate-100 text-slate-800 rounded-bl-sm'
+                                                                ? 'bg-blue-600 text-white rounded-br-sm'
+                                                                : 'bg-slate-100 text-slate-800 rounded-bl-sm'
                                                                 }`}
                                                         >
                                                             {msg.message}

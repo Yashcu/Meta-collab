@@ -8,7 +8,16 @@ import { BoardErrorBoundary } from '@/components/shared/BoardErrorBoundary'
 import { InviteModal } from '@/components/shared/InviteModal'
 import { ChatPanel } from '@/components/shared/ChatPanel'
 import Link from 'next/link'
-import { Task } from '@/components/shared/TaskCard'
+import { type Task } from '@/components/shared/TaskCard'
+
+type Member = {
+    userId: string
+    role: string
+    user: {
+        name: string | null
+        email: string
+    }
+}
 
 export default async function BoardPage({
     params,
@@ -31,7 +40,7 @@ export default async function BoardPage({
     if (!project) redirect('/dashboard')
 
     const isAdmin =
-        project.members.find((m) => m.userId === dbUser.id)?.role === 'ADMIN'
+        project.members.find((m: Member) => m.userId === dbUser.id)?.role === 'ADMIN'
 
     return (
         <div className="min-h-screen bg-slate-50">
@@ -51,13 +60,13 @@ export default async function BoardPage({
                     </div>
                     <div className="flex items-center gap-3">
                         <div className="flex -space-x-2">
-                            {project.members.slice(0, 4).map((m) => (
+                            {project.members.slice(0, 4).map((m: Member) => (
                                 <div
                                     key={m.userId}
                                     className="w-7 h-7 rounded-full bg-blue-100 text-blue-700 text-xs font-medium flex items-center justify-center border-2 border-white"
                                     title={m.user.name || m.user.email}
                                 >
-                                    {(m.user.name || m.user.email)[0].toUpperCase()}
+                                    {((m.user.name || m.user.email)[0] ?? '?').toUpperCase()}
                                 </div>
                             ))}
                             {project.members.length > 4 && (

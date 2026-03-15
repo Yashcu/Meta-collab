@@ -34,19 +34,19 @@ export function TaskCard({
         if (user.name) {
             return user.name
                 .split(' ')
-                .map((n) => n[0])
+                .map((n) => n[0] ?? '')
                 .join('')
                 .toUpperCase()
                 .slice(0, 2)
         }
-        return user.email[0].toUpperCase()
+        return (user.email[0] ?? '?').toUpperCase()
     }
 
     return (
         <div
             className={`bg-white border border-slate-200 rounded-lg p-3 shadow-sm transition-shadow group ${canEdit
-                    ? 'cursor-pointer hover:shadow-md'
-                    : 'cursor-default opacity-90'
+                ? 'cursor-pointer hover:shadow-md'
+                : 'cursor-default opacity-90'
                 }`}
             onClick={() => canEdit && onEdit(task)}
         >

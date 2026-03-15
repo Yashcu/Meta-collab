@@ -1,6 +1,6 @@
 'use client'
 
-import React, { Component, ReactNode } from 'react'
+import { Component, ReactNode } from 'react'
 
 interface Props {
     children: ReactNode
@@ -20,7 +20,7 @@ export class BoardErrorBoundary extends Component<Props, State> {
         return { hasError: true }
     }
 
-    render(): ReactNode {
+    override render(): ReactNode {
         if (this.state.hasError) {
             return (
                 <div className="flex flex-col items-center justify-center py-20 gap-3">
