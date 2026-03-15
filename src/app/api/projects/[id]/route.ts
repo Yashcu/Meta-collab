@@ -1,44 +1,42 @@
 import { getAuthUser } from '@/lib/auth'
-import { respondToInvitation } from '@/lib/services/invitation.service'
+import { getProjectById, deleteProject } from '@/lib/services/project.service'
 import { NextRequest, NextResponse } from 'next/server'
 
-export async function PATCH(
-    req: NextRequest,
+export async function GET(
+    _req: NextRequest,
     { params }: { params: Promise<{ id: string }> }
 ) {
     const user = await getAuthUser()
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-    const { id: invitationId } = await params
-    const body = await req.json()
-    const { status } = body
+    const { id } = await params
+    const project = await getProjectById(id, user.id)
 
-    if (status !== 'ACCEPTED' && status !== 'DECLINED') {
-        return NextResponse.json(
-            { error: 'Status must be ACCEPTED or DECLINED' },
-            { status: 400 }
-        )
+    if (!project) {
+        return NextResponse.json({ error: 'Not found' }, { status: 404 })
     }
 
+    return NextResponse.json({ project })
+}
+
+export async function DELETE(
+    _req: NextRequest,
+    { params }: { params: Promise<{ id: string }> }
+) {
+    const user = await getAuthUser()
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+    const { id } = await params
+
     try {
-        const invitation = await respondToInvitation(
-            invitationId,
-            user.id,
-            user.email,
-            status
-        )
-        return NextResponse.json({ invitation })
+        await deleteProject(id, user.id)
+        return NextResponse.json({ success: true })
     } catch (e: unknown) {
-        if (e instanceof Error) {
-            if (e.message === 'FORBIDDEN') {
-                return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-            }
-            if (e.message === 'NOT_FOUND') {
-                return NextResponse.json({ error: 'Invitation not found' }, { status: 404 })
-            }
-            if (e.message === 'ALREADY_RESPONDED') {
-                return NextResponse.json({ error: 'Already responded to this invitation' }, { status: 409 })
-            }
+        if (e instanceof Error && e.message === 'FORBIDDEN') {
+            return NextResponse.json(
+                { error: 'Only admins can delete projects' },
+                { status: 403 }
+            )
         }
         return NextResponse.json({ error: 'Server error' }, { status: 500 })
     }
