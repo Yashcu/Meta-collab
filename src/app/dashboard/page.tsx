@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation'
 import { getAuthUser } from '@/lib/auth'
 import { getUserProjects } from '@/lib/services/project.service'
 import { getPendingInvitations } from '@/lib/services/invitation.service'
-import { ProjectCard } from '@/components/shared/ProjectCard'
+import { ProjectCard, type ProjectCardData } from '@/components/shared/ProjectCard'
 import { CreateProjectModal } from '@/components/shared/CreateProjectModal'
 import { PendingInvitations } from '@/components/shared/PendingInvitations'
 import { SignOutButton } from '@clerk/nextjs'
@@ -55,7 +55,7 @@ export default async function DashboardPage() {
                             </h2>
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {projects.map((project) => (
+                            {projects.map((project: ProjectCardData) => (
                                 <ProjectCard key={project.id} project={project} />
                             ))}
                         </div>

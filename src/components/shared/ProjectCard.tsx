@@ -10,6 +10,14 @@ type Project = {
     _count: { members: number; tasks: number }
 }
 
+export type ProjectCardData = {
+    id: string
+    name: string
+    description: string | null
+    role: string
+    _count: { members: number; tasks: number }
+}
+
 export function ProjectCard({ project }: { project: Project }) {
     return (
         <Link href={`/projects/${project.id}/board`}>
