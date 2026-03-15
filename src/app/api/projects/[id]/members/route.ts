@@ -2,6 +2,17 @@ import { getAuthUser } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { NextRequest, NextResponse } from 'next/server'
 
+type MemberWithUser = {
+    userId: string
+    role: string
+    joinedAt: Date
+    user: {
+        id: string
+        name: string | null
+        email: string
+    }
+}
+
 export async function GET(
     _req: NextRequest,
     { params }: { params: Promise<{ id: string }> }
@@ -27,7 +38,7 @@ export async function GET(
     })
 
     return NextResponse.json({
-        members: members.map((m) => ({
+        members: members.map((m: MemberWithUser) => ({
             id: m.userId,
             name: m.user.name,
             email: m.user.email,
@@ -37,14 +48,14 @@ export async function GET(
 }
 
 export async function DELETE(
-    _req: NextRequest,
+    req: NextRequest,
     { params }: { params: Promise<{ id: string }> }
 ) {
     const user = await getAuthUser()
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
     const { id: projectId } = await params
-    const url = new URL(_req.url)
+    const url = new URL(req.url)
     const targetUserId = url.searchParams.get('userId')
 
     if (!targetUserId) {
@@ -55,7 +66,10 @@ export async function DELETE(
         where: { projectId, userId: user.id, role: 'ADMIN' },
     })
     if (!requester) {
-        return NextResponse.json({ error: 'Only admins can remove members' }, { status: 403 })
+        return NextResponse.json(
+            { error: 'Only admins can remove members' },
+            { status: 403 }
+        )
     }
 
     if (targetUserId === user.id) {

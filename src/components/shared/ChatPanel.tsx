@@ -43,20 +43,26 @@ export function ChatPanel({
         prevMessageCount.current = messages.length
     }, [messages.length, isOpen])
 
-    // Clear unread when panel opens
+    // On open: scroll, focus, clear unread — all deferred to avoid setState-in-effect
     useEffect(() => {
-        if (isOpen) {
-            setUnread(0)
-            setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }), 50)
-            setTimeout(() => inputRef.current?.focus(), 100)
+        if (!isOpen) return
+        const scrollTimer = setTimeout(
+            () => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }),
+            50
+        )
+        const focusTimer = setTimeout(() => inputRef.current?.focus(), 100)
+        const unreadTimer = setTimeout(() => setUnread(0), 0)
+        return () => {
+            clearTimeout(scrollTimer)
+            clearTimeout(focusTimer)
+            clearTimeout(unreadTimer)
         }
     }, [isOpen])
 
     // Auto scroll on new messages when open
     useEffect(() => {
-        if (isOpen) {
-            bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-        }
+        if (!isOpen) return
+        bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
     }, [messages, isOpen])
 
     async function handleSend() {
@@ -91,7 +97,6 @@ export function ChatPanel({
         return date.toLocaleDateString([], { month: 'short', day: 'numeric' })
     }
 
-    // Group messages by date
     const groupedMessages = messages.reduce(
         (groups, msg) => {
             const label = formatDateLabel(msg.createdAt)
@@ -104,36 +109,18 @@ export function ChatPanel({
 
     return (
         <>
-            {/* Toggle button */}
             <button
                 onClick={() => setIsOpen((v) => !v)}
                 className="fixed bottom-6 right-6 w-12 h-12 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-colors flex items-center justify-center z-40"
                 title="Toggle chat"
             >
                 {isOpen ? (
-                    <svg
-                        width="18"
-                        height="18"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                    >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
                         <line x1="18" y1="6" x2="6" y2="18" />
                         <line x1="6" y1="6" x2="18" y2="18" />
                     </svg>
                 ) : (
-                    <svg
-                        width="18"
-                        height="18"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                    >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
                     </svg>
                 )}
@@ -144,18 +131,14 @@ export function ChatPanel({
                 )}
             </button>
 
-            {/* Chat panel */}
             {isOpen && (
                 <div
                     className="fixed right-6 w-80 bg-white rounded-xl shadow-2xl border border-slate-200 flex flex-col z-40"
                     style={{ bottom: '80px', height: '460px' }}
                 >
-                    {/* Header */}
                     <div className="px-4 py-3 border-b border-slate-100">
                         <div className="flex items-center justify-between">
-                            <h3 className="text-sm font-semibold text-slate-900">
-                                Team chat
-                            </h3>
+                            <h3 className="text-sm font-semibold text-slate-900">Team chat</h3>
                             {activeUsers.length > 0 && (
                                 <div className="flex items-center gap-1.5">
                                     <span className="w-1.5 h-1.5 bg-green-500 rounded-full" />
@@ -170,7 +153,6 @@ export function ChatPanel({
                         </p>
                     </div>
 
-                    {/* Active users bar */}
                     {activeUsers.length > 0 && (
                         <div className="px-4 py-2 border-b border-slate-100 flex items-center gap-2">
                             <div className="flex -space-x-1">
@@ -194,7 +176,6 @@ export function ChatPanel({
                         </div>
                     )}
 
-                    {/* Messages */}
                     <div className="flex-1 overflow-y-auto px-4 py-3">
                         {messages.length === 0 ? (
                             <div className="flex items-center justify-center h-full">
@@ -208,29 +189,23 @@ export function ChatPanel({
                             <div className="space-y-4">
                                 {Object.entries(groupedMessages).map(([label, msgs]) => (
                                     <div key={label}>
-                                        {/* Date separator */}
                                         <div className="flex items-center gap-2 my-2">
                                             <div className="flex-1 h-px bg-slate-100" />
-                                            <span className="text-xs text-slate-300 shrink-0">
-                                                {label}
-                                            </span>
+                                            <span className="text-xs text-slate-300 shrink-0">{label}</span>
                                             <div className="flex-1 h-px bg-slate-100" />
                                         </div>
-
                                         <div className="space-y-3">
                                             {msgs.map((msg) => {
                                                 const isOwn = msg.user.id === currentUser.id
                                                 return (
                                                     <div
                                                         key={msg.id}
-                                                        className={`flex flex-col gap-0.5 ${isOwn ? 'items-end' : 'items-start'
-                                                            }`}
+                                                        className={`flex flex-col gap-0.5 ${isOwn ? 'items-end' : 'items-start'}`}
                                                     >
                                                         <span className="text-xs text-slate-400">
                                                             {isOwn
                                                                 ? 'You'
-                                                                : msg.user.name ||
-                                                                msg.user.email.split('@')[0]}
+                                                                : msg.user.name || msg.user.email.split('@')[0]}
                                                             {' · '}
                                                             {formatTime(msg.createdAt)}
                                                         </span>
@@ -253,7 +228,6 @@ export function ChatPanel({
                         <div ref={bottomRef} />
                     </div>
 
-                    {/* Input */}
                     <div className="px-3 py-3 border-t border-slate-100">
                         <div className="flex items-end gap-2">
                             <textarea
@@ -271,16 +245,7 @@ export function ChatPanel({
                                 disabled={!input.trim() || sending}
                                 className="w-8 h-8 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-40 transition-colors flex items-center justify-center shrink-0"
                             >
-                                <svg
-                                    width="14"
-                                    height="14"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="2.5"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                >
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                                     <line x1="22" y1="2" x2="11" y2="13" />
                                     <polygon points="22 2 15 22 11 13 2 9 22 2" />
                                 </svg>

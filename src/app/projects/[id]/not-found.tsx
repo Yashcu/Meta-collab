@@ -9,7 +9,7 @@ export default function ProjectNotFound() {
                     Project not found
                 </h1>
                 <p className="text-sm text-slate-400 mb-6">
-                    This project doesn't exist or you don't have access.
+                    This project doesn&apos;t exist or you don&apos;t have access.
                 </p>
                 <Link
                     href="/dashboard"

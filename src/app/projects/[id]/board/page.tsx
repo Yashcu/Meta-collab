@@ -8,6 +8,7 @@ import { BoardErrorBoundary } from '@/components/shared/BoardErrorBoundary'
 import { InviteModal } from '@/components/shared/InviteModal'
 import { ChatPanel } from '@/components/shared/ChatPanel'
 import Link from 'next/link'
+import { Task } from '@/components/shared/TaskCard'
 
 export default async function BoardPage({
     params,
@@ -77,7 +78,7 @@ export default async function BoardPage({
                             projectId={project.id}
                             currentUserId={dbUser.id}
                             isAdmin={isAdmin}
-                            initialTasks={tasks as any}
+                            initialTasks={tasks as Task[]}
                         />
                     </BoardErrorBoundary>
                 </div>

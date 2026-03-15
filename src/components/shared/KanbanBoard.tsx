@@ -251,7 +251,6 @@ export function KanbanBoard({
             {addingToStatus && (
                 <AddTaskModal
                     projectId={projectId}
-                    status={addingToStatus}
                     members={members}
                     onClose={() => setAddingToStatus(null)}
                     onCreated={(task) => {
@@ -281,13 +280,11 @@ export function KanbanBoard({
 
 function AddTaskModal({
     projectId,
-    status,
     members,
     onClose,
     onCreated,
 }: {
     projectId: string
-    status: string
     members: Member[]
     onClose: () => void
     onCreated: (task: Task) => void
